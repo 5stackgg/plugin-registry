@@ -16,9 +16,16 @@ Two different things are called "plugin" in 5Stack, and both live here:
 
 | `kind` | What it is | Installed by |
 | --- | --- | --- |
+| `panel` | A web app that mounts as a native page at `/apps/<slug>` | `./plugin.sh <repo>` on the panel host |
 | `game` | A CS2 server plugin (SwiftlyS2 or CounterStrikeSharp) that loads into the game server | The panel, into each node's plugin store |
-| `panel` | A Vue Module Federation remote that mounts as a page at `/apps/<slug>` | `./plugin.sh <repo>` on the panel host |
-| `bundle` | Both halves of one product, wired together on install | Both of the above |
+| `bundle` | One project shipping both halves itself | Both of the above |
+
+Most things that feel like a pair are not a bundle. 5Stack Inventory is a
+**panel** plugin that names the CS2 Inventory Simulator in `pairs_with` and
+describes how it configures it in `wiring` — the game plugin is somebody else's
+project with its own entry, and republishing its releases would list the same
+download twice under two names. Reach for `bundle` only when one repo genuinely
+ships both halves.
 
 ## Adding a plugin
 

@@ -1,12 +1,17 @@
 {
   "$schema": "../../schema/plugin.schema.json",
   "slug": "5stack-inventory",
-  "kind": "bundle",
+  "kind": "panel",
   "name": "5Stack Inventory",
   "author": "lukepolo",
-  "description": "A loadout editor that renders natively inside the panel, plus the game-server plugin that puts those loadouts in players' hands. Installs both halves and wires them together.",
+  "description": "A loadout editor that renders natively inside the panel. Pairs with the CS2 Inventory Simulator game plugin, which puts those loadouts in players' hands.",
   "homepage": "https://github.com/lukepolo/5stack-inventory-plugin",
-  "tags": ["cosmetics", "skins", "fun", "panel"],
+  "tags": [
+    "cosmetics",
+    "skins",
+    "fun",
+    "panel"
+  ],
   "verified": true,
   "hot_swappable": false,
   "panel": {
@@ -14,18 +19,9 @@
     "repo": "lukepolo/5stack-inventory-plugin",
     "install_command": "./plugin.sh lukepolo/5stack-inventory-plugin"
   },
-  "variants": {
-    "swiftlys2": {
-      "repo": "ianlucas/cs2-ss2-inventory-simulator",
-      "asset": "InventorySimulator-v*.zip",
-      "layout": "csgo"
-    },
-    "counterstrikesharp": {
-      "repo": "ianlucas/cs2-css-inventory-simulator",
-      "asset": "InventorySimulator-v*.zip",
-      "layout": "csgo"
-    }
-  },
+  "pairs_with": [
+    "inventory-simulator"
+  ],
   "wiring": {
     "provision": {
       "from": "panel",

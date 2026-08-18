@@ -120,8 +120,8 @@ export function validateEntry({ entry, filePath, directory, fileName }) {
   }
 
   if (entry.wiring) {
-    if (entry.kind !== "bundle") {
-      fail(`"wiring" only applies to kind "bundle"`);
+    if (entry.kind === "game") {
+      fail(`"wiring" describes how a panel plugin configures a game plugin, so it does not belong on a game entry`);
     }
 
     if (!entry.wiring.provision?.endpoint) {
@@ -146,6 +146,15 @@ export async function validateAll() {
       problems.push(`${filePath}: slug "${entry.slug}" already used by ${seen.get(entry.slug)}`);
     }
     seen.set(entry.slug, filePath);
+  }
+
+  // A dangling pairs_with renders as a broken link in the directory.
+  for (const { entry, filePath } of entries) {
+    for (const slug of entry.pairs_with ?? []) {
+      if (!seen.has(slug)) {
+        problems.push(`${filePath}: pairs_with names "${slug}", which is not in the registry`);
+      }
+    }
   }
 
   return { entries, problems };

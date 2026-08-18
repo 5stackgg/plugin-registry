@@ -115,7 +115,7 @@
     },
     "wiring": {
       "type": "object",
-      "description": "How a bundle's panel half configures its game half.",
+      "description": "How a panel plugin configures the game plugin it pairs with.",
       "required": [
         "provision",
         "config",
@@ -209,6 +209,13 @@
           }
         }
       }
+    },
+    "pairs_with": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Slugs of other entries this works with. A panel plugin that configures a game plugin names it here rather than republishing its releases."
     }
   },
   "definitions": {
