@@ -1,0 +1,20 @@
+{
+  "$schema": "../../schema/plugin.schema.json",
+  "slug": "deathmatch",
+  "kind": "game",
+  "name": "Deathmatch",
+  "author": "NockyCZ",
+  "description": "Free-for-all and team deathmatch with custom spawn points, weapon menus, per-round configs and multi-config support.",
+  "homepage": "https://github.com/NockyCZ/CS2-Deathmatch",
+  "tags": ["gamemode", "deathmatch", "warmup"],
+  "verified": true,
+  "hot_swappable": false,
+  "variants": {
+    "counterstrikesharp": {
+      "repo": "NockyCZ/CS2-Deathmatch",
+      "asset": "Deathmatch.zip",
+      "layout": "plugin",
+      "install_path": "addons/{runtime}/plugins"
+    }
+  }
+}

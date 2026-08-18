@@ -1,0 +1,19 @@
+{
+  "$schema": "../../schema/plugin.schema.json",
+  "slug": "retakes",
+  "kind": "game",
+  "name": "Retakes",
+  "author": "B3none",
+  "description": "Bombsite retakes with per-map spawns, weapon allocation and team balancing. The CS2 successor to splewis' CS:GO retakes.",
+  "homepage": "https://github.com/B3none/cs2-retakes",
+  "tags": ["gamemode", "retakes", "practice"],
+  "verified": true,
+  "hot_swappable": false,
+  "variants": {
+    "counterstrikesharp": {
+      "repo": "B3none/cs2-retakes",
+      "asset": "RetakesPlugin-*.zip",
+      "layout": "csgo"
+    }
+  }
+}
