@@ -1,0 +1,25 @@
+{
+  "$schema": "../../schema/plugin.schema.json",
+  "slug": "csroll",
+  "kind": "game",
+  "name": "CSRoll",
+  "author": "LCrew",
+  "description": "Chaos-mod style game modifiers. Players or admins roll gameplay-altering effects — jetpack, wallhack, speedhack, vampire, infinite ammo and ~40 more — scoped to a round, a run of rounds, or the whole match, server-wide or per player.",
+  "homepage": "https://github.com/LCrew/S2-CSRoll",
+  "tags": [
+    "fun",
+    "modifiers",
+    "chaos",
+    "gamemode"
+  ],
+  "verified": false,
+  "hot_swappable": false,
+  "variants": {
+    "swiftlys2": {
+      "repo": "LCrew/S2-CSRoll",
+      "asset": "CSRoll.zip",
+      "layout": "plugin",
+      "install_path": "addons/swiftlys2/plugins"
+    }
+  }
+}
