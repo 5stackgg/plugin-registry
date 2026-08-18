@@ -4,7 +4,11 @@ The catalog behind the **5Stack plugin directory**. Every 5Stack panel polls the
 index this repo publishes and renders it at `/plugins`, so adding a plugin here
 makes it one-click installable on every install in the world.
 
-Published to <https://registry.5stack.gg/index.json>.
+Published to <https://registry.5stack.gg/index.json> by GitHub Pages, rebuilt
+hourly so new upstream plugin releases appear on their own.
+
+The custom domain lives in the root `CNAME`, which the build copies into `dist/`
+— the published artifact is the site root, so the domain has to travel with it.
 
 ## What's in a plugin
 

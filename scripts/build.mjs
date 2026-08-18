@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import path from "node:path";
 import { validateAll } from "./validate.mjs";
@@ -138,6 +138,19 @@ for (const { entry } of entries) {
 plugins.sort((a, b) => a.slug.localeCompare(b.slug));
 
 await mkdir(path.join(DIST_DIR, "plugins"), { recursive: true });
+
+// The published artifact becomes the whole site root, so the custom domain has
+// to travel with it. Without this, a deploy can drop registry.5stack.gg back to
+// the github.io URL -- and that URL is the default every panel ships with.
+// A fork with no CNAME file simply publishes without one.
+try {
+  await copyFile(path.join(process.cwd(), "CNAME"), path.join(DIST_DIR, "CNAME"));
+  console.log("  carried CNAME into dist/");
+} catch (error) {
+  if (error.code !== "ENOENT") {
+    throw error;
+  }
+}
 
 const index = {
   version: 1,
