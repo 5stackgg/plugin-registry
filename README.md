@@ -4,7 +4,7 @@ The catalog behind the **5Stack plugin directory**. Every 5Stack panel polls the
 index this repo publishes and renders it at `/plugins`, so adding a plugin here
 makes it one-click installable on every install in the world.
 
-Published to <https://registry.5stack.gg/index.json> by GitHub Pages, rebuilt
+Published to <https://registry.5stack.gg/> by GitHub Pages, rebuilt
 hourly so new upstream plugin releases appear on their own.
 
 The custom domain lives in the root `CNAME`, which the build copies into `dist/`
@@ -31,6 +31,20 @@ Two different things are called "plugin" in 5Stack, and both live here:
 **Never write a `versions` array.** CI resolves it from the upstream repo's
 GitHub releases on every build, pinning each asset's URL and SHA-256 so a panel
 can verify what it downloads. Hand-written versions are rejected by the validator.
+
+### Linux only
+
+5Stack game servers are Linux containers (steamrt sniper). The build filters
+release assets accordingly:
+
+- an asset naming another platform (`windows`, `win64`, `osx`, `darwin`) is
+  never selected, and the validator rejects a glob that names one;
+- where a project ships one asset per platform, the Linux one is chosen rather
+  than whichever GitHub returns first;
+- a release that publishes *only* non-Linux assets is skipped with a warning.
+
+An asset that names no platform at all (a portable .NET zip, which is what most
+CS2 plugins ship) is taken as-is.
 
 ### Archive layout
 

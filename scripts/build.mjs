@@ -16,6 +16,25 @@ const headers = {
     : {}),
 };
 
+// 5Stack game servers are Linux containers (steamrt sniper). An asset built for
+// another platform unpacks perfectly well and then never loads, so it does not
+// belong in the catalog at all -- and where a project ships one asset per
+// platform, the Linux one has to be chosen rather than whichever GitHub happens
+// to return first.
+const FOREIGN_PLATFORM =
+  /(^|[-_.])(win|win32|win64|windows|osx|macos|darwin)([-_.]|$)/i;
+const LINUX_ASSET = /(^|[-_.])(linux|linuxsteamrt64)([-_.]|$)/i;
+
+export function selectLinuxAsset(assets, matches) {
+  const candidates = assets.filter((asset) => matches.test(asset.name));
+  const portable = candidates.filter((asset) => !FOREIGN_PLATFORM.test(asset.name));
+
+  return {
+    asset: portable.find((asset) => LINUX_ASSET.test(asset.name)) ?? portable[0] ?? null,
+    rejected: candidates.length - portable.length,
+  };
+}
+
 function globToRegExp(glob) {
   const escaped = glob.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*");
   return new RegExp(`^${escaped}$`);
@@ -76,11 +95,14 @@ async function resolveVariant(slug, runtime, variant) {
       continue;
     }
 
-    const asset = (release.assets ?? []).find((candidate) =>
-      matches.test(candidate.name),
-    );
+    const { asset, rejected } = selectLinuxAsset(release.assets ?? [], matches);
 
     if (!asset) {
+      if (rejected > 0) {
+        console.warn(
+          `  warning: ${slug}/${runtime} ${release.tag_name} only publishes non-Linux assets`,
+        );
+      }
       continue;
     }
 
@@ -110,64 +132,72 @@ async function resolveVariant(slug, runtime, variant) {
   return versions;
 }
 
-const { entries, problems } = await validateAll();
+export async function main() {
+  const { entries, problems } = await validateAll();
 
-if (problems.length > 0) {
-  for (const problem of problems) {
-    console.error(`  ${problem}`);
-  }
-  console.error(`\n${problems.length} problem(s); refusing to build`);
-  process.exit(1);
-}
-
-const plugins = [];
-
-for (const { entry } of entries) {
-  const versions = [];
-
-  for (const [runtime, variant] of Object.entries(entry.variants ?? {})) {
-    versions.push(...(await resolveVariant(entry.slug, runtime, variant)));
+  if (problems.length > 0) {
+    for (const problem of problems) {
+      console.error(`  ${problem}`);
+    }
+    console.error(`\n${problems.length} problem(s); refusing to build`);
+    process.exit(1);
   }
 
-  versions.sort((a, b) => b.published_at.localeCompare(a.published_at));
+  const plugins = [];
 
-  plugins.push({ ...entry, $schema: undefined, versions });
-  console.log(`  ${entry.slug}: ${versions.length} version(s)`);
-}
+  for (const { entry } of entries) {
+    const versions = [];
 
-plugins.sort((a, b) => a.slug.localeCompare(b.slug));
+    for (const [runtime, variant] of Object.entries(entry.variants ?? {})) {
+      versions.push(...(await resolveVariant(entry.slug, runtime, variant)));
+    }
 
-await mkdir(path.join(DIST_DIR, "plugins"), { recursive: true });
+    versions.sort((a, b) => b.published_at.localeCompare(a.published_at));
 
-// The published artifact becomes the whole site root, so the custom domain has
-// to travel with it. Without this, a deploy can drop registry.5stack.gg back to
-// the github.io URL -- and that URL is the default every panel ships with.
-// A fork with no CNAME file simply publishes without one.
-try {
-  await copyFile(path.join(process.cwd(), "CNAME"), path.join(DIST_DIR, "CNAME"));
-  console.log("  carried CNAME into dist/");
-} catch (error) {
-  if (error.code !== "ENOENT") {
-    throw error;
+    plugins.push({ ...entry, $schema: undefined, versions });
+    console.log(`  ${entry.slug}: ${versions.length} version(s)`);
   }
-}
 
-const index = {
-  version: 1,
-  generated_at: new Date().toISOString(),
-  plugins,
-};
+  plugins.sort((a, b) => a.slug.localeCompare(b.slug));
 
-await writeFile(
-  path.join(DIST_DIR, "index.json"),
-  `${JSON.stringify(index, null, 2)}\n`,
-);
+  await mkdir(path.join(DIST_DIR, "plugins"), { recursive: true });
 
-for (const plugin of plugins) {
+  // The published artifact becomes the whole site root, so the custom domain has
+  // to travel with it. Without this, a deploy can drop registry.5stack.gg back to
+  // the github.io URL -- and that URL is the default every panel ships with.
+  // A fork with no CNAME file simply publishes without one.
+  try {
+    await copyFile(path.join(process.cwd(), "CNAME"), path.join(DIST_DIR, "CNAME"));
+    console.log("  carried CNAME into dist/");
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      throw error;
+    }
+  }
+
+  const index = {
+    version: 1,
+    generated_at: new Date().toISOString(),
+    plugins,
+  };
+
   await writeFile(
-    path.join(DIST_DIR, "plugins", `${plugin.slug}.json`),
-    `${JSON.stringify(plugin, null, 2)}\n`,
+    path.join(DIST_DIR, "index.json"),
+    `${JSON.stringify(index, null, 2)}\n`,
   );
+
+  for (const plugin of plugins) {
+    await writeFile(
+      path.join(DIST_DIR, "plugins", `${plugin.slug}.json`),
+      `${JSON.stringify(plugin, null, 2)}\n`,
+    );
+  }
+
+  console.log(`\nbuilt dist/index.json with ${plugins.length} plugins`);
 }
 
-console.log(`\nbuilt dist/index.json with ${plugins.length} plugins`);
+// Importable without running: the tests pull selectLinuxAsset out of here,
+// and building on import would hit the GitHub API to do it.
+if (import.meta.url === `file://${process.argv[1]}`) {
+  await main();
+}

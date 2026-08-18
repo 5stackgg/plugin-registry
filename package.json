@@ -6,6 +6,7 @@
   "description": "The catalog behind the 5Stack plugin directory",
   "scripts": {
     "validate": "node scripts/validate.mjs",
+    "test": "node scripts/build.test.mjs",
     "build": "node scripts/build.mjs"
   },
   "engines": {

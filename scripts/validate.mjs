@@ -89,6 +89,15 @@ export function validateEntry({ entry, filePath, directory, fileName }) {
       fail(`${runtime}.asset is required`);
     }
 
+    // Game servers are Linux containers. A Windows asset would unpack fine and
+    // then never load, so it is rejected here rather than shipping a catalog
+    // entry that quietly does nothing.
+    if (/(^|[-_.])(win|win32|win64|windows|osx|macos|darwin)([-_.]|$|\*)/i.test(variant.asset ?? "")) {
+      fail(
+        `${runtime}.asset names a non-Linux platform; 5Stack game servers are Linux only`,
+      );
+    }
+
     const layout = variant.layout ?? "csgo";
 
     if (!LAYOUTS.has(layout)) {

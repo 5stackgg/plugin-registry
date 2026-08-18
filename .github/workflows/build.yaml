@@ -31,6 +31,9 @@ jobs:
       - name: Validate entries
         run: node scripts/validate.mjs
 
+      - name: Test
+        run: node scripts/build.test.mjs
+
       - name: Build index
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
