@@ -1,0 +1,142 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://5stack.gg/schemas/registry-plugin.json",
+  "title": "5Stack Plugin Registry Entry",
+  "type": "object",
+  "required": ["slug", "kind", "name", "author", "description"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "description": "Unique id. Also the directory name in a node's plugin store."
+    },
+    "kind": {
+      "enum": ["game", "panel", "bundle"],
+      "description": "game = CS2 server plugin, panel = Module Federation page, bundle = both."
+    },
+    "name": { "type": "string" },
+    "author": { "type": "string" },
+    "description": { "type": "string" },
+    "homepage": { "type": "string", "format": "uri" },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "verified": {
+      "type": "boolean",
+      "default": false,
+      "description": "Reviewed by a 5Stack maintainer. Set in review, never by the submitter."
+    },
+    "hot_swappable": {
+      "type": "boolean",
+      "default": false,
+      "description": "Safe to load/unload live over RCON without restarting the server."
+    },
+    "requires_service": {
+      "type": ["string", "null"],
+      "description": "External dependency an operator must provide, e.g. \"MySQL\"."
+    },
+    "variants": {
+      "type": "object",
+      "description": "Per-runtime source of the game plugin. Required when kind is game or bundle.",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "swiftlys2": { "$ref": "#/definitions/variant" },
+        "counterstrikesharp": { "$ref": "#/definitions/variant" }
+      }
+    },
+    "config_schema": {
+      "type": "object",
+      "description": "JSON Schema for the plugin's config file. The panel renders a form from it."
+    },
+    "config_path": {
+      "type": "string",
+      "description": "Where the config file is written, relative to game/csgo. {runtime} is substituted."
+    },
+    "cvars": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Console variables this plugin reads, for the mode cfg editor's autocomplete."
+    },
+    "panel": {
+      "type": "object",
+      "description": "Panel plugin coordinates. Required when kind is panel or bundle.",
+      "required": ["manifest_url"],
+      "additionalProperties": false,
+      "properties": {
+        "manifest_url": { "type": "string", "format": "uri" },
+        "repo": { "type": "string" },
+        "install_command": { "type": "string" }
+      }
+    },
+    "wiring": {
+      "type": "object",
+      "description": "How a bundle's panel half configures its game half.",
+      "required": ["provision", "config", "target"],
+      "additionalProperties": false,
+      "properties": {
+        "provision": {
+          "type": "object",
+          "required": ["from", "endpoint", "method"],
+          "additionalProperties": false,
+          "properties": {
+            "from": { "enum": ["panel"] },
+            "endpoint": { "type": "string" },
+            "method": { "enum": ["GET", "POST"] },
+            "response_key": { "type": "string" }
+          }
+        },
+        "config": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "Templated values. {panel.base_url} and {provision.<key>} are substituted."
+        },
+        "target": {
+          "enum": ["mode_cfg", "plugin_config"],
+          "description": "mode_cfg writes cvars into the game mode's cfg block."
+        }
+      }
+    },
+    "versions": {
+      "type": "array",
+      "description": "Injected by registry CI from upstream releases. Never hand-written.",
+      "items": {
+        "type": "object",
+        "required": ["version", "runtime", "url", "sha256", "published_at"],
+        "properties": {
+          "version": { "type": "string" },
+          "runtime": { "enum": ["swiftlys2", "counterstrikesharp"] },
+          "url": { "type": "string", "format": "uri" },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "size": { "type": "integer" },
+          "published_at": { "type": "string", "format": "date-time" },
+          "prerelease": { "type": "boolean" }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "variant": {
+      "type": "object",
+      "required": ["repo", "asset"],
+      "additionalProperties": false,
+      "properties": {
+        "repo": { "type": "string", "pattern": "^[^/]+/[^/]+$" },
+        "asset": {
+          "type": "string",
+          "description": "Glob matched against release asset names, e.g. \"InventorySimulator-v*.zip\"."
+        },
+        "layout": {
+          "enum": ["csgo", "plugin"],
+          "default": "csgo",
+          "description": "csgo = archive root is game/csgo. plugin = archive root is the plugin folder, extracted under install_path."
+        },
+        "install_path": {
+          "type": "string",
+          "description": "Required when layout is plugin. Relative to game/csgo; {runtime} is substituted."
+        },
+        "include_prereleases": { "type": "boolean", "default": false }
+      }
+    }
+  }
+}

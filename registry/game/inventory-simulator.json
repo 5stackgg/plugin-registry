@@ -1,0 +1,35 @@
+{
+  "$schema": "../../schema/plugin.schema.json",
+  "slug": "inventory-simulator",
+  "kind": "game",
+  "name": "CS2 Inventory Simulator",
+  "author": "ianlucas",
+  "description": "Gives players their skins, knives, gloves, agents, music kits and sprays from a web-hosted inventory, with StatTrak tracking and live refresh.",
+  "homepage": "https://github.com/ianlucas/cs2-ss2-inventory-simulator",
+  "tags": ["cosmetics", "skins", "fun"],
+  "verified": true,
+  "hot_swappable": false,
+  "requires_service": "An Inventory Simulator API (the 5Stack Inventory plugin serves one)",
+  "variants": {
+    "swiftlys2": {
+      "repo": "ianlucas/cs2-ss2-inventory-simulator",
+      "asset": "InventorySimulator-v*.zip",
+      "layout": "csgo"
+    },
+    "counterstrikesharp": {
+      "repo": "ianlucas/cs2-css-inventory-simulator",
+      "asset": "InventorySimulator-v*.zip",
+      "layout": "csgo"
+    }
+  },
+  "cvars": [
+    "invsim_url",
+    "invsim_apikey",
+    "invsim_ws_enabled",
+    "invsim_ws_immediately",
+    "invsim_require_inventory",
+    "invsim_spraychanger_enabled",
+    "invsim_stattrak_ignore_bots",
+    "invsim_minmodels"
+  ]
+}

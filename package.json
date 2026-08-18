@@ -1,0 +1,14 @@
+{
+  "name": "5stack-plugin-registry",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The catalog behind the 5Stack plugin directory",
+  "scripts": {
+    "validate": "node scripts/validate.mjs",
+    "build": "node scripts/build.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
