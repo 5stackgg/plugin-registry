@@ -119,6 +119,16 @@ export function validateEntry({ entry, filePath, directory, fileName }) {
     fail(`kind "${entry.kind}" requires "panel.manifest_url"`);
   }
 
+  // Without this the panel cannot tell an installed plugin from an available
+  // one: an operator hosts the app themselves, so the URL they registered has
+  // nothing in common with anything here. The route slug is fixed by the
+  // plugin's own manifest, so it is the one stable thing to match on.
+  if (needsPanel && !SLUG.test(entry.panel?.slug ?? "")) {
+    fail(
+      `kind "${entry.kind}" requires "panel.slug" — the slug from the plugin's 5stack-plugin.json`,
+    );
+  }
+
   if (entry.wiring) {
     if (entry.kind === "game") {
       fail(`"wiring" describes how a panel plugin configures a game plugin, so it does not belong on a game entry`);

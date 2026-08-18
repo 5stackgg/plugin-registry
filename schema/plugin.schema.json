@@ -97,6 +97,7 @@
       "type": "object",
       "description": "Panel plugin coordinates. Required when kind is panel or bundle.",
       "required": [
+        "slug",
         "manifest_url"
       ],
       "additionalProperties": false,
@@ -110,6 +111,11 @@
         },
         "install_command": {
           "type": "string"
+        },
+        "slug": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "description": "The slug from the plugin's own 5stack-plugin.json \u2014 the /apps/<slug> route it claims. The panel uses it to tell whether this is already installed."
         }
       }
     },

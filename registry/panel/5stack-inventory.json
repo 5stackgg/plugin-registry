@@ -15,6 +15,7 @@
   "verified": true,
   "hot_swappable": false,
   "panel": {
+    "slug": "inventory",
     "manifest_url": "https://github.com/lukepolo/5stack-inventory-plugin",
     "repo": "lukepolo/5stack-inventory-plugin",
     "install_command": "./plugin.sh lukepolo/5stack-inventory-plugin"
