@@ -10,6 +10,7 @@
   "verified": true,
   "hot_swappable": false,
   "requires_service": "An Inventory Simulator API (the 5Stack Inventory plugin serves one)",
+  "requires_server_guidelines_disabled": true,
   "variants": {
     "swiftlys2": {
       "repo": "ianlucas/cs2-ss2-inventory-simulator",

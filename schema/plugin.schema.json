@@ -64,6 +64,11 @@
       ],
       "description": "External dependency an operator must provide, e.g. \"MySQL\"."
     },
+    "requires_server_guidelines_disabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Needs FollowCS2ServerGuidelines set to false to work at all. The panel hides the plugin's functionality behind a per-install opt-in and warns that Valve can ban every GSLT on the operator's account."
+    },
     "variants": {
       "type": "object",
       "description": "Per-runtime source of the game plugin. Required when kind is game or bundle.",

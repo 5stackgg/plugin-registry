@@ -63,6 +63,22 @@ CS2 plugins ship) is taken as-is.
   (e.g. `addons/{runtime}/plugins/MyPlugin`) and the installer places it there.
   `{runtime}` expands to `swiftlys2` or `counterstrikesharp`.
 
+### Plugins that need Valve's server guidelines off
+
+Both frameworks ship `FollowCS2ServerGuidelines: true`, which blocks the calls a
+plugin needs to change what a player sees — custom HUDs, scoreboard text, rank
+badges. A plugin that cannot work without those calls declares:
+
+```json
+"requires_server_guidelines_disabled": true
+```
+
+Valve's position is that this can get **every GSLT on the server owner's Steam
+account banned**, so the panel never flips it on the strength of the registry
+alone: the flag only surfaces a per-install opt-in, off by default, next to that
+warning. Set it when the plugin genuinely does not function otherwise, not when
+it merely has a nicer HUD if you do.
+
 ### Runtimes are not interchangeable
 
 A CounterStrikeSharp plugin will not load under SwiftlyS2 and vice versa, so a
