@@ -1,7 +1,10 @@
-// Asset selection is the one piece of the build with real consequences: a
-// Windows asset installs cleanly onto a Linux game server and then never loads.
+// Two pieces of the build have real consequences. Asset selection: a Windows
+// asset installs cleanly onto a Linux game server and then never loads. Change
+// detection: a build wrongly judged identical to the live site is never
+// deployed, and the registry silently stops updating.
 import assert from "node:assert/strict";
 import { selectLinuxAsset } from "./build.mjs";
+import { sameIndex } from "./changed.mjs";
 
 const glob = (pattern) =>
   new RegExp(
@@ -66,8 +69,40 @@ test("ignores assets the glob does not match", () => {
   assert.equal(asset.name, "MyPlugin-v1.zip");
 });
 
+const index = (plugins, generated_at = "2026-01-01T00:00:00.000Z") =>
+  JSON.stringify({ version: 1, generated_at, plugins }, null, 2);
+
+test("treats a rebuild that only moved generated_at as unchanged", () => {
+  assert.equal(
+    sameIndex(
+      index([{ slug: "a", versions: [] }], "2026-01-01T00:00:00.000Z"),
+      index([{ slug: "a", versions: [] }], "2026-01-01T01:00:00.000Z"),
+    ),
+    true,
+  );
+});
+
+test("notices a new upstream version", () => {
+  assert.equal(
+    sameIndex(
+      index([{ slug: "a", versions: [{ version: "1.0.0" }] }]),
+      index([{ slug: "a", versions: [{ version: "1.1.0" }, { version: "1.0.0" }] }]),
+    ),
+    false,
+  );
+});
+
+test("notices a plugin added to or dropped from the catalog", () => {
+  assert.equal(sameIndex(index([{ slug: "a" }]), index([{ slug: "a" }, { slug: "b" }])), false);
+  assert.equal(sameIndex(index([{ slug: "a" }, { slug: "b" }]), index([{ slug: "a" }])), false);
+});
+
+test("treats an unreadable published index as changed", () => {
+  assert.equal(sameIndex("<html>404</html>", index([])), false);
+});
+
 if (failures > 0) {
   console.error(`\n${failures} test(s) failed`);
   process.exit(1);
 }
-console.log("\nall asset selection tests passed");
+console.log("\nall tests passed");

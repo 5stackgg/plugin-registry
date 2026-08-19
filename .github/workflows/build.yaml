@@ -8,6 +8,11 @@ on:
     # Upstream releases are picked up on the hour; the panel polls this index.
     - cron: "17 * * * *"
   workflow_dispatch:
+    inputs:
+      force:
+        description: "Deploy even if nothing changed since the last deploy"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -21,10 +26,12 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.diff.outputs.changed }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: "22"
 
@@ -39,13 +46,19 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node scripts/build.mjs
 
-      - uses: actions/upload-pages-artifact@v3
+      # Most hourly builds reproduce what is already live; those skip the deploy.
+      - name: Compare with the published registry
+        id: diff
         if: github.event_name != 'pull_request'
+        run: node scripts/changed.mjs
+
+      - uses: actions/upload-pages-artifact@v5
+        if: github.event_name != 'pull_request' && (steps.diff.outputs.changed == 'true' || inputs.force == true)
         with:
           path: dist
 
   deploy:
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' && (needs.build.outputs.changed == 'true' || inputs.force == true)
     needs: build
     runs-on: ubuntu-latest
     environment:
@@ -53,4 +66,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

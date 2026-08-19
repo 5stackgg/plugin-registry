@@ -5,7 +5,11 @@ index this repo publishes and renders it at `/plugins`, so adding a plugin here
 makes it one-click installable on every install in the world.
 
 Published to <https://registry.5stack.gg/> by GitHub Pages, rebuilt
-hourly so new upstream plugin releases appear on their own.
+hourly so new upstream plugin releases appear on their own. A build only
+deploys when what it produced differs from what the site already serves, so
+`generated_at` in the index marks the last time the catalog actually changed,
+not the last time the cron ran. A manual run of the workflow has a **force**
+option to redeploy regardless.
 
 The custom domain lives in the root `CNAME`, which the build copies into `dist/`
 — the published artifact is the site root, so the domain has to travel with it.
@@ -91,6 +95,7 @@ deployment (unless that deployment runs the CSS compatibility layer).
 ```sh
 npm run validate      # schema + cross-entry checks, no network
 npm run build         # resolves releases and writes dist/index.json
+node scripts/changed.mjs   # says whether dist/ differs from the live registry
 ```
 
 `build` hits the GitHub API. Set `GITHUB_TOKEN` to avoid the unauthenticated
