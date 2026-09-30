@@ -126,6 +126,12 @@ test("rejects map rotation paths that escape game/csgo", () => {
   assert.equal(validateMapRotation(rotation({ "../maps.jsonc": { Maps: "{{maps}}" } }), "x.json").length, 1);
 });
 
+test("rejects a file token embedded in longer text", () => {
+  const problems = validateMapRotation(rotation({ "a/maps.jsonc": { Maps: "x{{maps}}" } }), "x.json");
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /as a whole value/);
+});
+
 test("rejects map rotation tokens used in the wrong place", () => {
   assert.equal(validateMapRotation(rotation({ "a/maps.jsonc": { Maps: "{{maps}}", Id: "{{id}}" } }), "x.json").length, 1);
   assert.equal(
