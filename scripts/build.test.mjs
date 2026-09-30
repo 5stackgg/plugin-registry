@@ -5,6 +5,7 @@
 import assert from "node:assert/strict";
 import { selectLinuxAsset } from "./build.mjs";
 import { sameIndex } from "./changed.mjs";
+import { validateMapRotation } from "./validate.mjs";
 
 const glob = (pattern) =>
   new RegExp(
@@ -12,6 +13,11 @@ const glob = (pattern) =>
   );
 
 const named = (...names) => names.map((name) => ({ name }));
+
+const rotation = (files, map = { Name: "{{label}}", Id: "{{id}}" }) => ({
+  kind: "game",
+  map_rotation: { files, map },
+});
 
 let failures = 0;
 const test = (what, fn) => {
@@ -99,6 +105,33 @@ test("notices a plugin added to or dropped from the catalog", () => {
 
 test("treats an unreadable published index as changed", () => {
   assert.equal(sameIndex("<html>404</html>", index([])), false);
+});
+
+test("accepts a map rotation that writes the map list", () => {
+  const problems = validateMapRotation(
+    rotation({ "a/maps.jsonc": { Maps: "{{maps}}" }, "a/config.jsonc": { Random: "{{shuffle}}" } }),
+    "x.json",
+  );
+  assert.deepEqual(problems, []);
+});
+
+test("rejects a map rotation that never writes {{maps}}", () => {
+  const problems = validateMapRotation(rotation({ "a/config.jsonc": { Random: "{{shuffle}}" } }), "x.json");
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /never writes \{\{maps\}\}/);
+});
+
+test("rejects map rotation paths that escape game/csgo", () => {
+  assert.equal(validateMapRotation(rotation({ "/etc/maps.jsonc": { Maps: "{{maps}}" } }), "x.json").length, 1);
+  assert.equal(validateMapRotation(rotation({ "../maps.jsonc": { Maps: "{{maps}}" } }), "x.json").length, 1);
+});
+
+test("rejects map rotation tokens used in the wrong place", () => {
+  assert.equal(validateMapRotation(rotation({ "a/maps.jsonc": { Maps: "{{maps}}", Id: "{{id}}" } }), "x.json").length, 1);
+  assert.equal(
+    validateMapRotation(rotation({ "a/maps.jsonc": { Maps: "{{maps}}" } }, { Name: "{{maps}}" }), "x.json").length,
+    1,
+  );
 });
 
 if (failures > 0) {
