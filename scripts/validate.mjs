@@ -170,6 +170,18 @@ function tokensIn(value) {
   return [];
 }
 
+function stringsIn(value) {
+  if (typeof value === "string") {
+    return [value];
+  }
+
+  if (value && typeof value === "object") {
+    return Object.values(value).flatMap(stringsIn);
+  }
+
+  return [];
+}
+
 export function validateMapRotation(entry, filePath) {
   const problems = [];
   const fail = (message) => problems.push(`${filePath}: map_rotation ${message}`);
@@ -202,6 +214,16 @@ export function validateMapRotation(entry, filePath) {
     for (const token of tokensIn(document)) {
       if (!MAP_ROTATION_DOCUMENT_TOKENS.has(token)) {
         fail(`"${target}" uses ${token}; files may only use ${[...MAP_ROTATION_DOCUMENT_TOKENS].join(", ")}`);
+      }
+    }
+
+    // {{maps}} is a list and {{shuffle}} a boolean; inside longer text either
+    // would render as "[object Object]" or "true".
+    for (const value of stringsIn(document)) {
+      const embedded = tokensIn(value).filter((token) => MAP_ROTATION_DOCUMENT_TOKENS.has(token));
+
+      if (embedded.length > 0 && value !== embedded[0]) {
+        fail(`"${target}" must use ${embedded.join(", ")} as a whole value, not inside "${value}"`);
       }
     }
   }
