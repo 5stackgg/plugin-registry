@@ -1,0 +1,42 @@
+{
+  "$schema": "../../schema/plugin.schema.json",
+  "slug": "map-chooser",
+  "kind": "game",
+  "name": "MapChooser",
+  "author": "aga",
+  "description": "Map voting for community servers: rock the vote, nominations, end-of-map votes, extends and an automatic map cycle. Workshop maps by ID. Runs the map rotation set on a dedicated server.",
+  "homepage": "https://github.com/SwiftlyS2-Plugins/MapChooser",
+  "tags": ["maps", "voting", "rtv", "rotation", "community"],
+  "verified": false,
+  "hot_swappable": false,
+  "config_path": "addons/swiftlys2/configs/plugins/MapChooser/config.jsonc",
+  "map_rotation": {
+    "files": {
+      "addons/swiftlys2/configs/plugins/MapChooser/maps.jsonc": {
+        "MapChooserMaps": {
+          "Maps": "{{maps}}"
+        }
+      },
+      "addons/swiftlys2/configs/plugins/MapChooser/config.jsonc": {
+        "MapChooser": {
+          "Cycle": {
+            "Enabled": true,
+            "RandomOrder": "{{shuffle}}"
+          }
+        }
+      }
+    },
+    "map": {
+      "Name": "{{label}}",
+      "Id": "{{id}}"
+    }
+  },
+  "variants": {
+    "swiftlys2": {
+      "repo": "SwiftlyS2-Plugins/MapChooser",
+      "asset": "MapChooser-v*.zip",
+      "layout": "plugin",
+      "install_path": "addons/swiftlys2/plugins"
+    }
+  }
+}

@@ -98,6 +98,29 @@
       },
       "description": "Console variables this plugin reads, for the mode cfg editor's autocomplete."
     },
+    "map_rotation": {
+      "type": "object",
+      "description": "Declares this plugin runs a dedicated server's map rotation. The panel renders each file from the server's rotation and writes it before the server boots.",
+      "required": [
+        "files",
+        "map"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "files": {
+          "type": "object",
+          "minProperties": 1,
+          "description": "Path relative to game/csgo ({runtime} is substituted) mapped to the JSON document written there. A string that is exactly {{maps}} becomes the rendered map list, exactly {{shuffle}} becomes a boolean.",
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "map": {
+          "type": "object",
+          "description": "One rotation entry. {{id}} is the workshop id or the map name, {{name}} the map name, {{label}} the display name, {{workshop_id}} the workshop id or null."
+        }
+      }
+    },
     "panel": {
       "type": "object",
       "description": "Panel plugin coordinates. Required when kind is panel or bundle.",

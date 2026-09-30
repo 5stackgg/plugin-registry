@@ -129,6 +129,10 @@ export function validateEntry({ entry, filePath, directory, fileName }) {
     );
   }
 
+  if (entry.map_rotation) {
+    problems.push(...validateMapRotation(entry, filePath));
+  }
+
   if (entry.wiring) {
     if (entry.kind === "game") {
       fail(`"wiring" describes how a panel plugin configures a game plugin, so it does not belong on a game entry`);
@@ -140,6 +144,75 @@ export function validateEntry({ entry, filePath, directory, fileName }) {
 
     if (!["mode_cfg", "plugin_config"].includes(entry.wiring.target)) {
       fail(`"wiring.target" must be "mode_cfg" or "plugin_config"`);
+    }
+  }
+
+  return problems;
+}
+
+const MAP_ROTATION_DOCUMENT_TOKENS = new Set(["{{maps}}", "{{shuffle}}"]);
+const MAP_ROTATION_MAP_TOKENS = new Set([
+  "{{id}}",
+  "{{name}}",
+  "{{label}}",
+  "{{workshop_id}}",
+]);
+
+function tokensIn(value) {
+  if (typeof value === "string") {
+    return value.match(/\{\{[^}]*\}\}/g) ?? [];
+  }
+
+  if (value && typeof value === "object") {
+    return Object.values(value).flatMap(tokensIn);
+  }
+
+  return [];
+}
+
+export function validateMapRotation(entry, filePath) {
+  const problems = [];
+  const fail = (message) => problems.push(`${filePath}: map_rotation ${message}`);
+  const { files, map } = entry.map_rotation;
+
+  if (entry.kind === "panel") {
+    fail(`only belongs on a game or bundle entry`);
+  }
+
+  if (!files || typeof files !== "object" || Object.keys(files).length === 0) {
+    fail(`needs at least one file under "files"`);
+    return problems;
+  }
+
+  if (!map || typeof map !== "object" || Array.isArray(map)) {
+    fail(`needs a "map" object describing one entry`);
+    return problems;
+  }
+
+  for (const [target, document] of Object.entries(files)) {
+    if (target.startsWith("/") || target.includes("..")) {
+      fail(`path "${target}" must be relative to game/csgo`);
+    }
+
+    if (!document || typeof document !== "object" || Array.isArray(document)) {
+      fail(`"${target}" must map to a JSON object`);
+      continue;
+    }
+
+    for (const token of tokensIn(document)) {
+      if (!MAP_ROTATION_DOCUMENT_TOKENS.has(token)) {
+        fail(`"${target}" uses ${token}; files may only use ${[...MAP_ROTATION_DOCUMENT_TOKENS].join(", ")}`);
+      }
+    }
+  }
+
+  if (!Object.values(files).some((document) => tokensIn(document).includes("{{maps}}"))) {
+    fail(`never writes {{maps}}, so the rotation would go nowhere`);
+  }
+
+  for (const token of tokensIn(map)) {
+    if (!MAP_ROTATION_MAP_TOKENS.has(token)) {
+      fail(`"map" uses ${token}; entries may only use ${[...MAP_ROTATION_MAP_TOKENS].join(", ")}`);
     }
   }
 

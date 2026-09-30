@@ -83,6 +83,37 @@ alone: the flag only surfaces a per-install opt-in, off by default, next to that
 warning. Set it when the plugin genuinely does not function otherwise, not when
 it merely has a nicer HUD if you do.
 
+### Plugins that run a map rotation
+
+A dedicated server can carry a map rotation set in the panel. A plugin that can
+play one declares where the rotation goes, and the panel writes those files on
+every boot of a server that has a rotation (and loads the plugin there unless the
+server switches it off):
+
+```json
+"map_rotation": {
+  "files": {
+    "addons/swiftlys2/configs/plugins/MapChooser/maps.jsonc": {
+      "MapChooserMaps": { "Maps": "{{maps}}" }
+    },
+    "addons/swiftlys2/configs/plugins/MapChooser/config.jsonc": {
+      "MapChooser": { "Cycle": { "Enabled": true, "RandomOrder": "{{shuffle}}" } }
+    }
+  },
+  "map": { "Name": "{{label}}", "Id": "{{id}}" }
+}
+```
+
+`{{maps}}` becomes the list, one `map` object per entry; `{{shuffle}}` becomes the
+server's shuffle switch. In `map`, `{{id}}` is the workshop id or the map name
+(whatever `host_workshop_map` / `changelevel` takes), `{{name}}` the map name,
+`{{label}}` the display name and `{{workshop_id}}` the workshop id or null. A
+string that is exactly one token takes the token's type; anything else is text.
+
+Each file is written whole, so a file listed here replaces anything an operator
+put at that path on that server. Keep documents to the keys the rotation needs:
+MapChooser falls back to its defaults for every key the file leaves out.
+
 ### Runtimes are not interchangeable
 
 A CounterStrikeSharp plugin will not load under SwiftlyS2 and vice versa, so a
