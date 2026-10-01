@@ -3,17 +3,18 @@
   "slug": "retakes",
   "kind": "game",
   "name": "Retakes",
-  "author": "B3none",
-  "description": "Bombsite retakes with per-map spawns, weapon allocation and team balancing. The CS2 successor to splewis' CS:GO retakes.",
-  "homepage": "https://github.com/B3none/cs2-retakes",
+  "author": "aga",
+  "description": "Bombsite retakes with auto-plant, instant defuse, per-map spawns and smoke scenarios, round-type weapon and utility allocation, queueing and an in-game spawn editor. Loadout preferences persist when the Cookies plugin is installed.",
+  "homepage": "https://github.com/a2Labs-cc/SwiftlyS2-Retakes",
   "tags": ["gamemode", "retakes", "practice"],
   "verified": true,
   "hot_swappable": false,
   "variants": {
-    "counterstrikesharp": {
-      "repo": "B3none/cs2-retakes",
-      "asset": "RetakesPlugin-*.zip",
-      "layout": "csgo"
+    "swiftlys2": {
+      "repo": "a2Labs-cc/SwiftlyS2-Retakes",
+      "asset": "Retakes-v*.zip",
+      "layout": "plugin",
+      "install_path": "addons/swiftlys2/plugins"
     }
   }
 }

@@ -3,18 +3,26 @@
   "slug": "deathmatch",
   "kind": "game",
   "name": "Deathmatch",
-  "author": "NockyCZ",
-  "description": "Free-for-all and team deathmatch with custom spawn points, weapon menus, per-round configs and multi-config support.",
-  "homepage": "https://github.com/NockyCZ/CS2-Deathmatch",
-  "tags": ["gamemode", "deathmatch", "warmup"],
+  "author": "ianlucas",
+  "description": "Free-for-all deathmatch with random spawns, timed weapon-mode rotation (pistols, mid-tier, rifles), health and armor back on kills, gun commands and bot loadouts.",
+  "homepage": "https://github.com/ianlucas/cs2-ss2-deathmatch",
+  "tags": ["gamemode", "deathmatch", "ffa", "warmup"],
   "verified": true,
   "hot_swappable": false,
+  "cvars": [
+    "dm_chat_prefix",
+    "dm_modes_file",
+    "dm_pro_ratio",
+    "dm_replenish_health",
+    "dm_replenish_health_headshot",
+    "dm_replenish_armor",
+    "dm_replenish_armor_headshot"
+  ],
   "variants": {
-    "counterstrikesharp": {
-      "repo": "NockyCZ/CS2-Deathmatch",
-      "asset": "Deathmatch.zip",
-      "layout": "plugin",
-      "install_path": "addons/{runtime}/plugins"
+    "swiftlys2": {
+      "repo": "ianlucas/cs2-ss2-deathmatch",
+      "asset": "Deathmatch-v*.zip",
+      "layout": "csgo"
     }
   }
 }

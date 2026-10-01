@@ -1,0 +1,21 @@
+{
+  "$schema": "../../schema/plugin.schema.json",
+  "slug": "arenas",
+  "kind": "game",
+  "name": "Arenas",
+  "author": "shmitzas",
+  "description": "Ladder-based 1v1 and small-team arenas: players climb and fall through ranked arenas between rounds, with configurable weapon sets. A bug-fix fork of K4ryuu's K4-Arenas.",
+  "homepage": "https://github.com/shmitzas/K4-Arenas-Upkeep",
+  "tags": ["gamemode", "arena", "1v1", "aim"],
+  "verified": true,
+  "hot_swappable": false,
+  "requires_service": "A database (SQLite ships by default; MySQL and Postgres are supported)",
+  "variants": {
+    "swiftlys2": {
+      "repo": "shmitzas/K4-Arenas-Upkeep",
+      "asset": "K4-Arenas-v*.zip",
+      "layout": "plugin",
+      "install_path": "addons/{runtime}/plugins"
+    }
+  }
+}
