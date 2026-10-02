@@ -85,18 +85,51 @@
     },
     "config_schema": {
       "type": "object",
-      "description": "JSON Schema for the plugin's config file. The panel renders a form from it."
+      "description": "JSON Schema for the plugin's config file. The panel renders a form from it; without one the file is edited as JSON."
     },
     "config_path": {
       "type": "string",
       "description": "Where the config file is written, relative to game/csgo. {runtime} is substituted."
+    },
+    "config_cvar": {
+      "type": "string",
+      "description": "Console variable the plugin reads the config file's path from. The panel sets it to config_path on every server it writes the file to."
+    },
+    "config_shipped": {
+      "type": "object",
+      "description": "Where the plugin keeps its own copy of the config file, so the panel can link to it.",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Where the release installs it, relative to game/csgo. {runtime} is substituted."
+        },
+        "repo_path": {
+          "type": "string",
+          "description": "Where it lives in the source repository, linked at the installed release's tag."
+        }
+      }
+    },
+    "config_default": {
+      "type": [
+        "object",
+        "array"
+      ],
+      "description": "The config file the plugin ships with. The panel starts the editor from it."
     },
     "cvars": {
       "type": "array",
       "items": {
         "type": "string"
       },
-      "description": "Console variables this plugin reads, for the mode cfg editor's autocomplete."
+      "description": "Console variables this plugin reads. A server running the plugin reports each one's description, type and default to the panel, which renders the settings form from them."
+    },
+    "forced_cvars": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Console variables the plugin sets itself on every map load, after the server's configs have run. The panel warns when a config sets one, because the plugin overwrites it."
     },
     "map_rotation": {
       "type": "object",

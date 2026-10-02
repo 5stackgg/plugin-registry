@@ -114,6 +114,33 @@ Each file is written whole, so a file listed here replaces anything an operator
 put at that path on that server. Keep documents to the keys the rotation needs:
 MapChooser falls back to its defaults for every key the file leaves out.
 
+### Settings and config files
+
+`cvars` lists the console variables a plugin reads. A server running the plugin
+reports each one's description and default, and the panel turns the list into a
+settings form on the plugin's page.
+
+A plugin that reads a JSON file describes it with `config_path` (where it is
+written, relative to `game/csgo`), `config_default` (what the plugin ships with,
+which the editor starts from) and optionally `config_schema` (the form to render;
+without one the file is edited as JSON). When the plugin finds the file through a
+console variable rather than a fixed path, name it in `config_cvar` and the panel
+points it at `config_path` on every server it writes the file to:
+
+```json
+"config_path": "addons/swiftlys2/configs/plugins/Deathmatch/modes.json",
+"config_cvar": "dm_modes_file",
+"config_default": [{ "name": "Pistols", "weapons": ["deagle"], "duration": 300 }]
+```
+
+`config_shipped` says where the plugin keeps its own copy (`path`, as installed
+under `game/csgo`, and `repo_path`, in its repository), so the plugin's page can
+open it on a node and link to it at the release that is installed.
+
+`forced_cvars` lists the console variables a plugin sets itself on every map
+load, after the server's configs have run. Setting one anywhere in the panel does
+nothing, so the panel warns when a config tries.
+
 ### Runtimes are not interchangeable
 
 A CounterStrikeSharp plugin will not load under SwiftlyS2 and vice versa, so a

@@ -133,6 +133,8 @@ export function validateEntry({ entry, filePath, directory, fileName }) {
     problems.push(...validateMapRotation(entry, filePath));
   }
 
+  problems.push(...validateConfig(entry, filePath));
+
   if (entry.wiring) {
     if (entry.kind === "game") {
       fail(`"wiring" describes how a panel plugin configures a game plugin, so it does not belong on a game entry`);
@@ -235,6 +237,146 @@ export function validateMapRotation(entry, filePath) {
   for (const token of tokensIn(map)) {
     if (!MAP_ROTATION_MAP_TOKENS.has(token)) {
       fail(`"map" uses ${token}; entries may only use ${[...MAP_ROTATION_MAP_TOKENS].join(", ")}`);
+    }
+  }
+
+  return problems;
+}
+
+const CVAR = /^[A-Za-z0-9_.]+$/;
+
+export function validateConfig(entry, filePath) {
+  const problems = [];
+  const fail = (message) => problems.push(`${filePath}: ${message}`);
+
+  for (const field of ["cvars", "forced_cvars"]) {
+    if (entry[field] === undefined) {
+      continue;
+    }
+
+    if (!Array.isArray(entry[field])) {
+      fail(`"${field}" must be a list of console variable names`);
+      continue;
+    }
+
+    for (const name of entry[field]) {
+      if (typeof name !== "string" || !CVAR.test(name)) {
+        fail(`"${field}" has ${JSON.stringify(name)}, which is not a console variable name`);
+      }
+    }
+  }
+
+  const path = entry.config_path;
+
+  if (path !== undefined && (typeof path !== "string" || path.startsWith("/") || path.includes(".."))) {
+    fail(`"config_path" must be a relative path inside game/csgo`);
+  }
+
+  for (const field of ["config_schema", "config_default", "config_cvar", "config_shipped"]) {
+    if (entry[field] !== undefined && !path) {
+      fail(`"${field}" describes the config file, so it needs "config_path"`);
+    }
+  }
+
+  for (const field of ["path", "repo_path"]) {
+    const shipped = entry.config_shipped?.[field];
+
+    if (shipped !== undefined && (typeof shipped !== "string" || shipped.startsWith("/") || shipped.includes(".."))) {
+      fail(`"config_shipped.${field}" must be a relative path`);
+    }
+  }
+
+  if (
+    entry.config_shipped !== undefined &&
+    (typeof entry.config_shipped !== "object" || entry.config_shipped === null || Array.isArray(entry.config_shipped))
+  ) {
+    fail(`"config_shipped" must be an object with "path" and "repo_path"`);
+  }
+
+  if (entry.config_cvar !== undefined && (typeof entry.config_cvar !== "string" || !CVAR.test(entry.config_cvar))) {
+    fail(`"config_cvar" must be a console variable name`);
+  }
+
+  if (entry.config_default !== undefined && entry.config_schema) {
+    for (const problem of schemaProblems(entry.config_schema, entry.config_default, "config_default")) {
+      fail(problem);
+    }
+  }
+
+  return problems;
+}
+
+// The subset of JSON Schema the panel's form understands. A default the form
+// cannot render is a broken editor, so it is held to the same rules.
+export function schemaProblems(schema, value, at) {
+  const problems = [];
+  const type = schema?.type;
+
+  const matches =
+    type === undefined ||
+    (type === "array" && Array.isArray(value)) ||
+    (type === "object" && value !== null && typeof value === "object" && !Array.isArray(value)) ||
+    (type === "string" && typeof value === "string") ||
+    (type === "boolean" && typeof value === "boolean") ||
+    (type === "number" && typeof value === "number") ||
+    (type === "integer" && Number.isInteger(value));
+
+  if (!matches) {
+    return [`${at} should be ${type}, got ${JSON.stringify(value)}`];
+  }
+
+  if (schema.enum && !schema.enum.includes(value)) {
+    problems.push(`${at} is ${JSON.stringify(value)}, which is not one of its options`);
+  }
+
+  if (typeof value === "number") {
+    if (schema.minimum !== undefined && value < schema.minimum) {
+      problems.push(`${at} is below its minimum of ${schema.minimum}`);
+    }
+
+    if (schema.maximum !== undefined && value > schema.maximum) {
+      problems.push(`${at} is above its maximum of ${schema.maximum}`);
+    }
+  }
+
+  if (type === "array") {
+    // A duplicate is not a style problem: the Deathmatch plugin keys a mode's
+    // weapons by item id and drops the whole file on the second one.
+    if (schema.uniqueItems) {
+      const seen = new Set();
+
+      for (const item of value) {
+        const key = JSON.stringify(item);
+
+        if (seen.has(key)) {
+          problems.push(`${at} lists ${key} more than once`);
+        }
+
+        seen.add(key);
+      }
+    }
+
+    value.forEach((item, index) => {
+      problems.push(...schemaProblems(schema.items ?? {}, item, `${at}[${index}]`));
+    });
+  }
+
+  if (type === "object") {
+    for (const key of schema.required ?? []) {
+      if (value[key] === undefined || value[key] === "") {
+        problems.push(`${at}.${key} is required`);
+      }
+    }
+
+    for (const [key, item] of Object.entries(value)) {
+      const property = schema.properties?.[key];
+
+      if (!property) {
+        problems.push(`${at}.${key} is not described by the schema`);
+        continue;
+      }
+
+      problems.push(...schemaProblems(property, item, `${at}.${key}`));
     }
   }
 

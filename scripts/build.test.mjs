@@ -5,7 +5,7 @@
 import assert from "node:assert/strict";
 import { selectLinuxAsset } from "./build.mjs";
 import { sameIndex } from "./changed.mjs";
-import { validateMapRotation } from "./validate.mjs";
+import { validateConfig, validateMapRotation } from "./validate.mjs";
 
 const glob = (pattern) =>
   new RegExp(
@@ -138,6 +138,104 @@ test("rejects map rotation tokens used in the wrong place", () => {
     validateMapRotation(rotation({ "a/maps.jsonc": { Maps: "{{maps}}" } }, { Name: "{{maps}}" }), "x.json").length,
     1,
   );
+});
+
+const modes = {
+  type: "array",
+  items: {
+    type: "object",
+    required: ["name"],
+    properties: {
+      name: { type: "string" },
+      duration: { type: "integer", minimum: 1 },
+      weapons: { type: "array", items: { type: "string", enum: ["ak47", "awp"] } },
+    },
+  },
+};
+
+const configEntry = (fields) => ({ kind: "game", config_path: "a/modes.json", ...fields });
+
+test("accepts a config default the form can render", () => {
+  const problems = validateConfig(
+    configEntry({ config_schema: modes, config_default: [{ name: "Rifles", duration: 60, weapons: ["ak47"] }] }),
+    "x.json",
+  );
+  assert.deepEqual(problems, []);
+});
+
+// The panel opens the editor on the default, so one that breaks the schema is an
+// editor that is broken before anyone touches it.
+test("rejects a config default that breaks its own schema", () => {
+  const problems = validateConfig(
+    configEntry({
+      config_schema: modes,
+      config_default: [{ duration: 0, weapons: ["knife"], helmet: true }],
+    }),
+    "x.json",
+  );
+  assert.equal(problems.length, 4);
+  assert.match(problems.join("\n"), /name is required/);
+  assert.match(problems.join("\n"), /below its minimum/);
+  assert.match(problems.join("\n"), /"knife", which is not one of its options/);
+  assert.match(problems.join("\n"), /helmet is not described by the schema/);
+});
+
+test("rejects a list the schema says holds each value once", () => {
+  const problems = validateConfig(
+    configEntry({
+      config_schema: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            name: { type: "string" },
+            weapons: { type: "array", uniqueItems: true, items: { type: "string", enum: ["ak47", "awp"] } },
+          },
+        },
+      },
+      config_default: [{ name: "Rifles", weapons: ["ak47", "awp", "ak47"] }],
+    }),
+    "x.json",
+  );
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /"ak47" more than once/);
+});
+
+test("treats an empty required value as missing, as the editor does", () => {
+  const problems = validateConfig(
+    configEntry({ config_schema: modes, config_default: [{ name: "" }] }),
+    "x.json",
+  );
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /name is required/);
+});
+
+test("rejects config fields with no file to describe", () => {
+  const problems = validateConfig(
+    { kind: "game", config_cvar: "dm_modes_file", config_default: {} },
+    "x.json",
+  );
+  assert.equal(problems.length, 2);
+});
+
+test("rejects a config path that escapes game/csgo", () => {
+  assert.equal(validateConfig(configEntry({ config_path: "../modes.json" }), "x.json").length, 1);
+});
+
+test("rejects a shipped config path that escapes game/csgo", () => {
+  const problems = validateConfig(
+    configEntry({ config_shipped: { path: "../default.json", repo_path: "resources/default.json" } }),
+    "x.json",
+  );
+  assert.equal(problems.length, 1);
+});
+
+test("rejects forced cvars that are not console variable names", () => {
+  const problems = validateConfig(
+    configEntry({ forced_cvars: ["mp_timelimit", "mp_timelimit 2"] }),
+    "x.json",
+  );
+  assert.equal(problems.length, 1);
 });
 
 if (failures > 0) {
