@@ -18,6 +18,435 @@
     "dm_replenish_armor",
     "dm_replenish_armor_headshot"
   ],
+  "config_path": "addons/swiftlys2/configs/plugins/Deathmatch/modes.json",
+  "config_cvar": "dm_modes_file",
+  "config_schema": {
+    "type": "array",
+    "title": "Weapon rotation",
+    "description": "Each mode runs for its duration, then the next one starts. Players can only pick the weapons their mode allows.",
+    "items": {
+      "type": "object",
+      "title": "Mode",
+      "required": ["name", "weapons", "duration"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name"
+        },
+        "duration": {
+          "type": "integer",
+          "title": "Duration (seconds)",
+          "minimum": 1
+        },
+        "helmet": {
+          "type": "boolean",
+          "title": "Helmet",
+          "default": true
+        },
+        "weapons": {
+          "type": "array",
+          "title": "Allowed weapons",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "deagle",
+              "elite",
+              "fiveseven",
+              "glock",
+              "tec9",
+              "hkp2000",
+              "p250",
+              "usp_silencer",
+              "cz75a",
+              "revolver",
+              "mac10",
+              "mp5sd",
+              "mp7",
+              "mp9",
+              "ump45",
+              "p90",
+              "bizon",
+              "mag7",
+              "nova",
+              "sawedoff",
+              "xm1014",
+              "m249",
+              "negev",
+              "ak47",
+              "m4a1",
+              "m4a1_silencer",
+              "aug",
+              "sg556",
+              "famas",
+              "galilar",
+              "awp",
+              "ssg08",
+              "scar20",
+              "g3sg1"
+            ]
+          }
+        },
+        "bots": {
+          "type": "object",
+          "title": "Bot loadout",
+          "required": ["secondary"],
+          "properties": {
+            "secondary": {
+              "type": "array",
+              "title": "Secondary",
+              "items": {
+                "type": "object",
+                "required": ["weapon", "probability"],
+                "properties": {
+                  "weapon": {
+                    "type": "string",
+                    "title": "Weapon",
+                    "enum": [
+                      "deagle",
+                      "elite",
+                      "fiveseven",
+                      "glock",
+                      "tec9",
+                      "hkp2000",
+                      "p250",
+                      "usp_silencer",
+                      "cz75a",
+                      "revolver",
+                      "mac10",
+                      "mp5sd",
+                      "mp7",
+                      "mp9",
+                      "ump45",
+                      "p90",
+                      "bizon",
+                      "mag7",
+                      "nova",
+                      "sawedoff",
+                      "xm1014",
+                      "m249",
+                      "negev",
+                      "ak47",
+                      "m4a1",
+                      "m4a1_silencer",
+                      "aug",
+                      "sg556",
+                      "famas",
+                      "galilar",
+                      "awp",
+                      "ssg08",
+                      "scar20",
+                      "g3sg1"
+                    ]
+                  },
+                  "probability": {
+                    "type": "number",
+                    "title": "Chance",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                }
+              }
+            },
+            "primary": {
+              "type": "array",
+              "title": "Primary",
+              "items": {
+                "type": "object",
+                "required": ["weapon", "probability"],
+                "properties": {
+                  "weapon": {
+                    "type": "string",
+                    "title": "Weapon",
+                    "enum": [
+                      "deagle",
+                      "elite",
+                      "fiveseven",
+                      "glock",
+                      "tec9",
+                      "hkp2000",
+                      "p250",
+                      "usp_silencer",
+                      "cz75a",
+                      "revolver",
+                      "mac10",
+                      "mp5sd",
+                      "mp7",
+                      "mp9",
+                      "ump45",
+                      "p90",
+                      "bizon",
+                      "mag7",
+                      "nova",
+                      "sawedoff",
+                      "xm1014",
+                      "m249",
+                      "negev",
+                      "ak47",
+                      "m4a1",
+                      "m4a1_silencer",
+                      "aug",
+                      "sg556",
+                      "famas",
+                      "galilar",
+                      "awp",
+                      "ssg08",
+                      "scar20",
+                      "g3sg1"
+                    ]
+                  },
+                  "probability": {
+                    "type": "number",
+                    "title": "Chance",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "config_shipped": {
+    "path": "addons/swiftlys2/plugins/Deathmatch/resources/configs/default.json",
+    "repo_path": "resources/configs/default.json"
+  },
+  "config_default": [
+    {
+      "name": "Pistols",
+      "weapons": [
+        "usp_silencer",
+        "deagle",
+        "elite",
+        "fiveseven",
+        "glock",
+        "tec9",
+        "hkp2000",
+        "p250",
+        "cz75a",
+        "revolver"
+      ],
+      "helmet": false,
+      "duration": 300,
+      "bots": {
+        "secondary": [
+          {
+            "weapon": "usp_silencer",
+            "probability": 0.8
+          },
+          {
+            "weapon": "glock",
+            "probability": 0.1
+          },
+          {
+            "weapon": "deagle",
+            "probability": 0.1
+          }
+        ]
+      }
+    },
+    {
+      "name": "Mid-Tier",
+      "weapons": [
+        "deagle",
+        "mp9",
+        "usp_silencer",
+        "elite",
+        "fiveseven",
+        "glock",
+        "tec9",
+        "hkp2000",
+        "p250",
+        "cz75a",
+        "revolver",
+        "mac10",
+        "mp5sd",
+        "mp7",
+        "ump45"
+      ],
+      "duration": 300,
+      "bots": {
+        "secondary": [
+          {
+            "weapon": "deagle",
+            "probability": 1
+          }
+        ],
+        "primary": [
+          {
+            "weapon": "mp9",
+            "probability": 0.3
+          },
+          {
+            "weapon": "mac10",
+            "probability": 0.1
+          }
+        ]
+      }
+    },
+    {
+      "name": "Rifles",
+      "weapons": [
+        "deagle",
+        "ak47",
+        "usp_silencer",
+        "elite",
+        "fiveseven",
+        "glock",
+        "tec9",
+        "hkp2000",
+        "p250",
+        "cz75a",
+        "revolver",
+        "m4a1",
+        "m4a1_silencer",
+        "aug",
+        "sg556",
+        "famas",
+        "galilar",
+        "awp",
+        "ssg08"
+      ],
+      "duration": 1200,
+      "bots": {
+        "secondary": [
+          {
+            "weapon": "deagle",
+            "probability": 1
+          }
+        ],
+        "primary": [
+          {
+            "weapon": "ak47",
+            "probability": 0.7
+          },
+          {
+            "weapon": "m4a1",
+            "probability": 0.1
+          },
+          {
+            "weapon": "m4a1_silencer",
+            "probability": 0.1
+          },
+          {
+            "weapon": "awp",
+            "probability": 0.1
+          }
+        ]
+      }
+    }
+  ],
+  "forced_cvars": [
+    "sv_hibernate_when_empty",
+    "bot_join_after_player",
+    "mp_warmuptime",
+    "mp_warmup_online_enabled",
+    "mp_roundtime",
+    "mp_roundtime_defuse",
+    "mp_respawn_immunitytime",
+    "mp_dm_healthshot_killcount",
+    "mp_dm_time_between_bonus_min",
+    "mp_dm_time_between_bonus_max",
+    "mp_buytime",
+    "mp_buy_anywhere",
+    "mp_buy_during_immunity",
+    "bot_difficulty",
+    "mp_bot_ai_bt",
+    "bot_autodifficulty_threshold_high",
+    "bot_autodifficulty_threshold_low",
+    "bot_chatter",
+    "bot_defer_to_human_goals",
+    "bot_defer_to_human_items",
+    "bot_quota",
+    "bot_quota_mode",
+    "cash_player_bomb_defused",
+    "cash_player_bomb_planted",
+    "cash_player_damage_hostage",
+    "cash_player_interact_with_hostage",
+    "cash_player_killed_enemy_default",
+    "cash_player_killed_enemy_factor",
+    "cash_player_killed_hostage",
+    "cash_player_killed_teammate",
+    "cash_player_rescued_hostage",
+    "cash_team_elimination_bomb_map",
+    "cash_team_elimination_hostage_map_t",
+    "cash_team_elimination_hostage_map_ct",
+    "cash_team_hostage_alive",
+    "cash_team_hostage_interaction",
+    "cash_team_loser_bonus",
+    "cash_team_loser_bonus_consecutive_rounds",
+    "cash_team_planted_bomb_but_defused",
+    "cash_team_rescued_hostage",
+    "cash_team_terrorist_win_bomb",
+    "cash_team_win_by_defusing_bomb",
+    "cash_team_win_by_hostage_rescue",
+    "cash_team_win_by_time_running_out_bomb",
+    "cash_team_win_by_time_running_out_hostage",
+    "ff_damage_reduction_bullets",
+    "ff_damage_reduction_grenade",
+    "ff_damage_reduction_grenade_self",
+    "ff_damage_reduction_other",
+    "mp_afterroundmoney",
+    "mp_death_drop_defuser",
+    "mp_death_drop_grenade",
+    "mp_death_drop_gun",
+    "mp_defuser_allocation",
+    "mp_force_pick_time",
+    "mp_forcecamera",
+    "mp_freezetime",
+    "mp_friendlyfire",
+    "mp_win_panel_display_time",
+    "mp_halftime",
+    "mp_match_can_clinch",
+    "mp_maxmoney",
+    "mp_maxrounds",
+    "mp_playercashawards",
+    "mp_startmoney",
+    "mp_teamcashawards",
+    "mp_timelimit",
+    "mp_weapons_allow_zeus",
+    "mp_weapons_allow_typecount",
+    "spec_freeze_time",
+    "sv_talk_enemy_living",
+    "sv_talk_enemy_dead",
+    "sv_deadtalk",
+    "sv_ignoregrenaderadio",
+    "mp_randomspawn",
+    "mp_randomspawn_los",
+    "tv_delay",
+    "ammo_grenade_limit_flashbang",
+    "ammo_grenade_limit_total",
+    "mp_weapons_allow_map_placed",
+    "mp_weapons_glow_on_ground",
+    "mp_display_kill_assists",
+    "mp_respawn_on_death_t",
+    "mp_respawn_on_death_ct",
+    "mp_ct_default_melee",
+    "mp_ct_default_secondary",
+    "mp_ct_default_primary",
+    "mp_t_default_melee",
+    "mp_t_default_secondary",
+    "mp_t_default_primary",
+    "mp_default_team_winner_no_objective",
+    "mp_buy_allow_grenades",
+    "mp_teammates_are_enemies",
+    "mp_solid_teammates",
+    "sv_max_deathmatch_respawns_per_tick",
+    "sv_disconnected_players_cleanup_delay",
+    "r_decals_overide_fadestarttime_params",
+    "mp_limitteams",
+    "sv_gameinstructor_enable",
+    "mp_promoted_item_enabled",
+    "sv_allow_annotations_access_level",
+    "mp_give_player_c4",
+    "sv_warmup_to_freezetime_delay",
+    "sv_disable_radar",
+    "sv_minimum_desired_chicken_count",
+    "sv_infinite_ammo",
+    "mp_free_armor"
+  ],
   "variants": {
     "swiftlys2": {
       "repo": "ianlucas/cs2-ss2-deathmatch",
