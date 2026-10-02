@@ -5,7 +5,11 @@
 import assert from "node:assert/strict";
 import { selectLinuxAsset } from "./build.mjs";
 import { sameIndex } from "./changed.mjs";
-import { validateConfig, validateMapRotation } from "./validate.mjs";
+import {
+  validateConfig,
+  validateMapRotation,
+  validateWorkshopAddons,
+} from "./validate.mjs";
 
 const glob = (pattern) =>
   new RegExp(
@@ -233,6 +237,55 @@ test("rejects a shipped config path that escapes game/csgo", () => {
 test("rejects forced cvars that are not console variable names", () => {
   const problems = validateConfig(
     configEntry({ forced_cvars: ["mp_timelimit", "mp_timelimit 2"] }),
+    "x.json",
+  );
+  assert.equal(problems.length, 1);
+});
+
+const addonsEntry = (fields) => ({
+  kind: "game",
+  variants: { swiftlys2: { repo: "a/b", asset: "B.zip" } },
+  ...fields,
+});
+
+test("accepts workshop addons on a SwiftlyS2 plugin", () => {
+  const problems = validateWorkshopAddons(
+    addonsEntry({ workshop_addons: ["3791548068", "3070212801"] }),
+    "x.json",
+  );
+  assert.deepEqual(problems, []);
+});
+
+// AddonsManager refuses its whole config over one bad id, so a number that
+// lost precision or a pasted URL is caught before it reaches a server.
+test("rejects a workshop id that is not a string of digits", () => {
+  const problems = validateWorkshopAddons(
+    addonsEntry({
+      workshop_addons: [
+        3791548068,
+        "https://steamcommunity.com/sharedfiles/filedetails/?id=3791548068",
+        "",
+      ],
+    }),
+    "x.json",
+  );
+  assert.equal(problems.length, 3);
+});
+
+test("rejects a workshop id listed twice", () => {
+  const problems = validateWorkshopAddons(
+    addonsEntry({ workshop_addons: ["3791548068", "3791548068"] }),
+    "x.json",
+  );
+  assert.equal(problems.length, 1);
+});
+
+test("rejects workshop addons on a plugin with no SwiftlyS2 build", () => {
+  const problems = validateWorkshopAddons(
+    addonsEntry({
+      variants: { counterstrikesharp: { repo: "a/b", asset: "B.zip" } },
+      workshop_addons: ["3791548068"],
+    }),
     "x.json",
   );
   assert.equal(problems.length, 1);

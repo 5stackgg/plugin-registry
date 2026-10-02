@@ -134,6 +134,7 @@ export function validateEntry({ entry, filePath, directory, fileName }) {
   }
 
   problems.push(...validateConfig(entry, filePath));
+  problems.push(...validateWorkshopAddons(entry, filePath));
 
   if (entry.wiring) {
     if (entry.kind === "game") {
@@ -301,6 +302,53 @@ export function validateConfig(entry, filePath) {
     for (const problem of schemaProblems(entry.config_schema, entry.config_default, "config_default")) {
       fail(problem);
     }
+  }
+
+  return problems;
+}
+
+const WORKSHOP_ID = /^[0-9]+$/;
+
+// AddonsManager validates its config when it starts, so one id that is not a
+// bare number takes it down on every server running the plugin -- and the
+// addons with it. Each is held to that here instead.
+export function validateWorkshopAddons(entry, filePath) {
+  const problems = [];
+  const fail = (message) => problems.push(`${filePath}: ${message}`);
+  const addons = entry.workshop_addons;
+
+  if (addons === undefined) {
+    return problems;
+  }
+
+  if (!Array.isArray(addons)) {
+    fail(`"workshop_addons" must be a list of workshop ids`);
+    return problems;
+  }
+
+  if (entry.kind === "panel") {
+    fail(`"workshop_addons" only belongs on a game or bundle entry`);
+  }
+
+  // The only AddonsManager 5Stack ships is in the SwiftlyS2 image. A plugin
+  // with no SwiftlyS2 build would list addons no server ever serves.
+  if (!entry.variants?.swiftlys2) {
+    fail(`"workshop_addons" are served by AddonsManager, which 5Stack only ships for SwiftlyS2, so the entry needs a swiftlys2 variant`);
+  }
+
+  const seen = new Set();
+
+  for (const id of addons) {
+    if (typeof id !== "string" || !WORKSHOP_ID.test(id)) {
+      fail(`"workshop_addons" has ${JSON.stringify(id)}; a workshop id is a string of digits, e.g. "3791548068"`);
+      continue;
+    }
+
+    if (seen.has(id)) {
+      fail(`"workshop_addons" lists ${id} more than once`);
+    }
+
+    seen.add(id);
   }
 
   return problems;

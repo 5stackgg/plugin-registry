@@ -83,6 +83,28 @@ alone: the flag only surfaces a per-install opt-in, off by default, next to that
 warning. Set it when the plugin genuinely does not function otherwise, not when
 it merely has a nicer HUD if you do.
 
+### Plugins that ship workshop addons
+
+CS2 cannot send files from a server to a player, so a plugin's custom models,
+sounds, particles or Panorama layouts have to reach players as a Steam Workshop
+addon. A plugin that needs one lists the workshop ids:
+
+```json
+"workshop_addons": ["3791548068"]
+```
+
+5Stack's SwiftlyS2 image ships
+[AddonsManager](https://github.com/SwiftlyS2-Plugins/AddonsManager), so nothing
+else has to be installed: every server that loads the plugin turns it on and
+serves exactly the addons its plugins list. Players download them while they
+connect, and the server fetches each addon again whenever it mounts it, so a
+republished addon reaches players without a new plugin release.
+
+The ids are strings, because a workshop id is too large for a JSON number. The
+entry needs a `swiftlys2` variant, since the SwiftlyS2 image is the only one
+with AddonsManager. A CounterStrikeSharp server loading the same plugin starts
+without the addons and logs why.
+
 ### Plugins that run a map rotation
 
 A dedicated server can carry a map rotation set in the panel. A plugin that can

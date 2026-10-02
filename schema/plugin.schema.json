@@ -69,6 +69,15 @@
       "default": false,
       "description": "Needs FollowCS2ServerGuidelines set to false to work at all. The panel hides the plugin's functionality behind a per-install opt-in and warns that Valve can ban every GSLT on the operator's account."
     },
+    "workshop_addons": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[0-9]+$"
+      },
+      "description": "Steam Workshop ids of addons the plugin's players need: models, sounds, particles, Panorama layouts. A server loading the plugin turns on the AddonsManager built into 5Stack's SwiftlyS2 image, which has connecting players download them. Strings, not numbers: workshop ids overflow a JSON number."
+    },
     "variants": {
       "type": "object",
       "description": "Per-runtime source of the game plugin. Required when kind is game or bundle.",
