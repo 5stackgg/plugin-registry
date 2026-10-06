@@ -14,6 +14,9 @@
   ],
   "verified": false,
   "hot_swappable": false,
+  "workshop_addons": [
+    "3791730390"
+  ],
   "variants": {
     "swiftlys2": {
       "repo": "LCrew/S2-CSRoll",
