@@ -1,6 +1,7 @@
 {
   "name": "5stack-plugin-registry",
   "version": "1.0.0",
+  "license": "MIT",
   "private": true,
   "type": "module",
   "description": "The catalog behind the 5Stack plugin directory",
