@@ -187,3 +187,7 @@ An operator can mirror or fork this registry and point their panel at it:
 
 **Settings → Application → Game Plugins → Registry URL**, or the
 `public.plugin_registry_url` setting.
+
+## License
+
+[MIT](LICENSE)
