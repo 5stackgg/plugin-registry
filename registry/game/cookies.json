@@ -1,0 +1,21 @@
+{
+  "$schema": "../../schema/plugin.schema.json",
+  "slug": "cookies",
+  "kind": "game",
+  "name": "Cookies",
+  "author": "SwiftlyS2-Plugins",
+  "description": "Per-player and per-server key-value storage other plugins read and write through a shared interface. Retakes keeps each player's loadout and spawn preferences in it.",
+  "homepage": "https://github.com/SwiftlyS2-Plugins/Cookies",
+  "tags": ["library", "storage"],
+  "hot_swappable": false,
+  "requires_service": "A database (the `cookies` connection, or the default one when none has that name)",
+  "pairs_with": ["retakes"],
+  "variants": {
+    "swiftlys2": {
+      "repo": "SwiftlyS2-Plugins/Cookies",
+      "asset": "Cookies-v*.zip",
+      "layout": "plugin",
+      "install_path": "addons/swiftlys2/plugins"
+    }
+  }
+}
