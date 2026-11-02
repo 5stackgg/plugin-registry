@@ -3,15 +3,15 @@
   "slug": "retakes",
   "kind": "game",
   "name": "Retakes",
-  "author": "aga",
-  "description": "Bombsite retakes with auto-plant, instant defuse, per-map spawns and smoke scenarios, round-type weapon and utility allocation, queueing and an in-game spawn editor. Loadout preferences persist when the Cookies plugin is installed.",
-  "homepage": "https://github.com/a2Labs-cc/SwiftlyS2-Retakes",
+  "author": "EsportAdria",
+  "description": "Bombsite retakes with auto-plant, instant defuse, per-map spawns and smoke scenarios, round-type weapon and utility allocation, queueing and an in-game spawn editor. Loadout preferences persist when the Cookies plugin is installed. A bug-fix fork of aga's a2Labs-cc/SwiftlyS2-Retakes.",
+  "homepage": "https://github.com/EsportAdria/SwiftlyS2-Retakes",
   "tags": ["gamemode", "retakes", "practice"],
   "verified": true,
   "hot_swappable": false,
   "variants": {
     "swiftlys2": {
-      "repo": "a2Labs-cc/SwiftlyS2-Retakes",
+      "repo": "EsportAdria/SwiftlyS2-Retakes",
       "asset": "Retakes-v*.zip",
       "layout": "plugin",
       "install_path": "addons/swiftlys2/plugins"
