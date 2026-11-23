@@ -135,6 +135,7 @@ export function validateEntry({ entry, filePath, directory, fileName }) {
 
   problems.push(...validateConfig(entry, filePath));
   problems.push(...validateWorkshopAddons(entry, filePath));
+  problems.push(...validateRequiresMetamod(entry, filePath));
 
   if (entry.wiring) {
     if (entry.kind === "game") {
@@ -356,6 +357,24 @@ export function validateWorkshopAddons(entry, filePath) {
 
 // The subset of JSON Schema the panel's form understands. A default the form
 // cannot render is a broken editor, so it is held to the same rules.
+// A string "true" reads as truthy everywhere but the panel's boolean column,
+// where the sync would fail the whole entry.
+export function validateRequiresMetamod(entry, filePath) {
+  if (entry.requires_metamod === undefined) {
+    return [];
+  }
+
+  if (typeof entry.requires_metamod !== "boolean") {
+    return [`${filePath}: "requires_metamod" must be true or false`];
+  }
+
+  if (entry.requires_metamod && entry.kind === "panel") {
+    return [`${filePath}: "requires_metamod" only belongs on a game or bundle entry`];
+  }
+
+  return [];
+}
+
 export function schemaProblems(schema, value, at) {
   const problems = [];
   const type = schema?.type;
