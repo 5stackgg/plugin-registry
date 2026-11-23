@@ -8,6 +8,7 @@ import { sameIndex } from "./changed.mjs";
 import {
   validateConfig,
   validateMapRotation,
+  validateRequiresMetamod,
   validateWorkshopAddons,
 } from "./validate.mjs";
 
@@ -246,6 +247,24 @@ const addonsEntry = (fields) => ({
   kind: "game",
   variants: { swiftlys2: { repo: "a/b", asset: "B.zip" } },
   ...fields,
+});
+
+test("accepts requires_metamod on a game plugin", () => {
+  assert.deepEqual(
+    validateRequiresMetamod(addonsEntry({ requires_metamod: true }), "x.json"),
+    [],
+  );
+});
+
+test("rejects requires_metamod that is not a boolean, or on a panel plugin", () => {
+  assert.equal(
+    validateRequiresMetamod(addonsEntry({ requires_metamod: "true" }), "x.json").length,
+    1,
+  );
+  assert.equal(
+    validateRequiresMetamod({ kind: "panel", requires_metamod: true }, "x.json").length,
+    1,
+  );
 });
 
 test("accepts workshop addons on a SwiftlyS2 plugin", () => {

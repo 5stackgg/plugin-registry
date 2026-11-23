@@ -83,6 +83,21 @@ alone: the flag only surfaces a per-install opt-in, off by default, next to that
 warning. Set it when the plugin genuinely does not function otherwise, not when
 it merely has a nicer HUD if you do.
 
+### Plugins that need Metamod
+
+A native Metamod:Source plugin (a `.vdf` in `addons/metamod` and its own
+`addons/<name>/bin`) loads on either 5Stack image, but SwiftlyS2 servers only
+start Metamod for a plugin that asks:
+
+```json
+"requires_metamod": true
+```
+
+Every server that loads the plugin then starts Metamod ahead of SwiftlyS2, which
+keeps working underneath it; servers that load no such plugin are unchanged. A
+Metamod plugin usually ships one archive for both runtimes, so list it under
+both `variants`.
+
 ### Plugins that ship workshop addons
 
 CS2 cannot send files from a server to a player, so a plugin's custom models,
